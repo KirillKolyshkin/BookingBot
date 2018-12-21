@@ -1,0 +1,9 @@
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\bin\Debug\netstandard2.0\BookingBot.Core.deps.json
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\bin\Debug\netstandard2.0\BookingBot.Core.dll
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\bin\Debug\netstandard2.0\BookingBot.Core.pdb
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\obj\Debug\netstandard2.0\BookingBot.Core.csprojResolveAssemblyReference.cache
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\obj\Debug\netstandard2.0\BookingBot.Core.csproj.CoreCompileInputs.cache
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\obj\Debug\netstandard2.0\BookingBot.Core.AssemblyInfoInputs.cache
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\obj\Debug\netstandard2.0\BookingBot.Core.AssemblyInfo.cs
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\obj\Debug\netstandard2.0\BookingBot.Core.dll
+C:\Users\kolys\source\repos\Solution1\BookingBot.Core\obj\Debug\netstandard2.0\BookingBot.Core.pdb

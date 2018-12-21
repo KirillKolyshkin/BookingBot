@@ -1,0 +1,14 @@
+C:\Users\kolys\source\repos\Solution1\TelegramBot\obj\Debug\TelegramBot.csprojResolveAssemblyReference.cache
+C:\Users\kolys\source\repos\Solution1\TelegramBot\obj\Debug\TelegramBot.csproj.CoreCompileInputs.cache
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\TelegramBot.exe.config
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\TelegramBot.exe
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\TelegramBot.pdb
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\Newtonsoft.Json.dll
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\Org.Mentalis.dll
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\SocksWebProxy.dll
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\Telegram.Bot.dll
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\Newtonsoft.Json.xml
+C:\Users\kolys\source\repos\Solution1\TelegramBot\bin\Debug\Telegram.Bot.xml
+C:\Users\kolys\source\repos\Solution1\TelegramBot\obj\Debug\TelegramBot.csproj.CopyComplete
+C:\Users\kolys\source\repos\Solution1\TelegramBot\obj\Debug\TelegramBot.exe
+C:\Users\kolys\source\repos\Solution1\TelegramBot\obj\Debug\TelegramBot.pdb
