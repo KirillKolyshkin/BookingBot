@@ -22,8 +22,6 @@ namespace BookingBot.Infrastructure
         private ReserveDataContext context;
         private Guid GetId() => Guid.NewGuid();
 
-        //public void SaveChanges() => context.SaveChanges();
-
         public bool EnableToReserve(TimeSession timeSession, int roomNumb)
         {
             var classroom = GetRumByNum(roomNumb);
@@ -50,28 +48,23 @@ namespace BookingBot.Infrastructure
             DateTime endOfPrevious = DateTime.Now;
             DateTime startOfNext;
             var tSesId = GetId();
-            foreach (var session in context.Sessions.Where(s => 
+            foreach (var session in context.Sessions.Where(s =>
             GetTimeSessionById(s.TimeSessionId).EndTime > DateTime.Now
             && !s.Cancaled).OrderBy(s => GetTimeSessionById(s.TimeSessionId).StartTime))
             {
                 var timeSession = GetTimeSessionById(session.TimeSessionId);
-                Console.Write(timeSession.StartTime + "   " + timeSession.EndTime);
                 if (endOfPrevious > timeSession.StartTime)
                 {
                     endOfPrevious = timeSession.EndTime;
-                    Console.Write("kek");
                     continue;
                 }
                 startOfNext = timeSession.StartTime;
                 TimeSpan interval = startOfNext - endOfPrevious;
                 if (neededTime <= interval)
                 {
-                    Console.WriteLine("ok");
-                    Console.WriteLine("new Date: " + endOfPrevious);
                     var newContext = new ReserveDataContext();
                     newContext.TimeSessions.Add(new TimeSession(endOfPrevious, neededTime, tSesId));
                     newContext.SaveChanges();
-                    Console.WriteLine("ok");
                     return new ReserveSesion(GetId(), classroom.Id, user.Id, tSesId);
                 }
                 endOfPrevious = timeSession.EndTime;
@@ -81,11 +74,8 @@ namespace BookingBot.Infrastructure
             return new ReserveSesion(GetId(), classroom.Id, user.Id, tSesId);
         }
 
-        //context = new ReserveDataContext();
-
         public Classroom GetRumByNum(int roomNum) => context.Classrooms.Single(c => c.RoomNumber == roomNum);
         public Classroom GetRumById(Guid id) => context.Classrooms.Single(c => c.Id == id);
-        //public ReserveSesion GetReserveSesionById(Guid id) => context.Sessions.First(s => s.Id == id);
         public TimeSession GetTimeSessionById(Guid id)
         {
             var context = new ReserveDataContext();
@@ -135,7 +125,6 @@ namespace BookingBot.Infrastructure
         {
             var context = new ReserveDataContext();
             var room = GetRumByNum(roomNum);
-            Console.WriteLine("aaaa" + room.RoomNumber);
             return context
                 .Sessions
                 .Where(s => (GetTimeSessionById(s.TimeSessionId).StartTime.Date == date.Date
@@ -144,7 +133,7 @@ namespace BookingBot.Infrastructure
                 .ToList();
         }
 
-        public string ReservationToStr( ReserveSesion rs)
+        public string ReservationToStr(ReserveSesion rs)
         {
             var timeSession = GetTimeSessionById(rs.TimeSessionId);
             var room = GetRumById(rs.RoomId);
