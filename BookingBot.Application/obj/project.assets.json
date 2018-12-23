@@ -57,7 +57,7 @@
           "lib/netstandard2.0/Microsoft.EntityFrameworkCore.Design.dll": {}
         },
         "build": {
-          "build/netcoreapp2.0/Microsoft.EntityFrameworkCore.Design.props": {}
+          "build/netcoreapp2.0/_._": {}
         }
       },
       "Microsoft.EntityFrameworkCore.Relational/2.2.0": {
@@ -847,6 +847,21 @@
         },
         "runtime": {
           "bin/placeholder/BookingBot.Core.dll": {}
+        }
+      },
+      "BookingBot.Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v2.0",
+        "dependencies": {
+          "BookingBot.Core": "1.0.0",
+          "Microsoft.EntityFrameworkCore.Tools": "2.2.0",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "2.2.0"
+        },
+        "compile": {
+          "bin/placeholder/BookingBot.Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/BookingBot.Infrastructure.dll": {}
         }
       }
     }
@@ -3260,14 +3275,17 @@
       "type": "project",
       "path": "../BookingBot.Core/BookingBot.Core.csproj",
       "msbuildProject": "../BookingBot.Core/BookingBot.Core.csproj"
+    },
+    "BookingBot.Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../BookingBot.Infrastructure/BookingBot.Infrastructure.csproj",
+      "msbuildProject": "../BookingBot.Infrastructure/BookingBot.Infrastructure.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
-      "BookingBot.Core >= 1.0.0",
-      "Microsoft.EntityFrameworkCore.Tools >= 2.2.0",
-      "Microsoft.NETCore.App >= 2.0.0",
-      "Npgsql.EntityFrameworkCore.PostgreSQL >= 2.2.0"
+      "BookingBot.Infrastructure >= 1.0.0",
+      "Microsoft.NETCore.App >= 2.0.0"
     ]
   },
   "packageFolders": {
@@ -3277,11 +3295,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Infrastructure\\BookingBot.Infrastructure.csproj",
-      "projectName": "BookingBot.Infrastructure",
-      "projectPath": "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Infrastructure\\BookingBot.Infrastructure.csproj",
+      "projectUniqueName": "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Application\\BookingBot.Application.csproj",
+      "projectName": "BookingBot.Application",
+      "projectPath": "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Application\\BookingBot.Application.csproj",
       "packagesPath": "C:\\Users\\kolys\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Infrastructure\\obj\\",
+      "outputPath": "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Application\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -3300,8 +3318,8 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Core\\BookingBot.Core.csproj": {
-              "projectPath": "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Core\\BookingBot.Core.csproj"
+            "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Infrastructure\\BookingBot.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\kolys\\source\\repos\\BOT\\BookingBot.Infrastructure\\BookingBot.Infrastructure.csproj"
             }
           }
         }
@@ -3315,19 +3333,10 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Tools": {
-            "target": "Package",
-            "version": "[2.2.0, )"
-          },
           "Microsoft.NETCore.App": {
-            "suppressParent": "All",
             "target": "Package",
             "version": "[2.0.0, )",
             "autoReferenced": true
-          },
-          "Npgsql.EntityFrameworkCore.PostgreSQL": {
-            "target": "Package",
-            "version": "[2.2.0, )"
           }
         },
         "imports": [

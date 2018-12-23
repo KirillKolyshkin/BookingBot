@@ -48,6 +48,6 @@ namespace BookingBot.Application
                 Console.WriteLine($"{DateTime.UtcNow}: {e}");
             }
         }
-        
+
     }
 }

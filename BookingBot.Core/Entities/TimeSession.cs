@@ -21,13 +21,15 @@ namespace BookingBot.Core.Entities
 
         }
 
-        public TimeSession(DateTime startTime, TimeSpan interval)
+        public TimeSession(DateTime startTime, TimeSpan interval, Guid id)
         {
+            Id = id;
             StartTime = startTime;
             Interval = interval;
             EndTime = StartTime + Interval;
         }
 
+        public Guid Id { get; set; }
         public DateTime StartTime { get; private set; }
         public DateTime EndTime { get; private set; }
         public TimeSpan Interval { get; private set; }

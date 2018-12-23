@@ -18,6 +18,7 @@ namespace Booking.Infrastucture
         public DbSet<User> Users { get; set; }
         public DbSet<Classroom> Classrooms { get; set; }
         public DbSet<ReserveSesion> Sessions { get; set; }
+        public DbSet<TimeSession> TimeSessions { get; set; }
     }
 }
 

@@ -18,6 +18,10 @@ namespace TelegramBot
     {
         static private Dictionary<long, Conditions> userConditions = new Dictionary<long, Conditions>();
         static ITelegramBotClient botClient;
+        static bool isReservation = false;
+        static bool findNearest = false;
+        static DateTime localDate = new DateTime();
+        static int localRoomNum = 0;
 
         public void CreateBot()
         {
@@ -78,9 +82,6 @@ namespace TelegramBot
         static async void Bot_OnMessage(object sender, MessageEventArgs e)
         {
             var chatId = e.Message.Chat.Id;
-            DateTime localDate = new DateTime();
-            int localRoomNum = 0;
-            bool isReservation = false;
             if (!userConditions.ContainsKey(chatId))
             {
                 userConditions.Add(chatId, Conditions.PreInitialize);
@@ -91,7 +92,7 @@ namespace TelegramBot
             {
                 case Conditions.PreInitialize:
                     {
-                        await botClient.SendTextMessageAsync(chatId, "Hello, I'm booking boot, please write your name and surname");
+                        await botClient.SendTextMessageAsync(chatId, "Hello, I'm booking boot, please write your name");
                         userConditions[chatId] = Conditions.Initialize;
                         break;
                     }
@@ -132,15 +133,17 @@ namespace TelegramBot
                             case "/Reserve":
                                 {
                                     isReservation = true;
-                                    await botClient.SendTextMessageAsync(chatId, "Please write Date Format DD/MM/YYYY HH:MM");
+                                    await botClient.SendTextMessageAsync(chatId, "Please write Date Format DD/MM/YYYY HH:MM:SS");
                                     userConditions[chatId] = Conditions.ChoosingDay;
                                     break;
                                 }
                             case "/FindNearest":
                                 {
                                     isReservation = true;
-                                    await botClient.SendTextMessageAsync(chatId, "we try to find smt to you");
-                                    userConditions[chatId] = Conditions.ApproveReservation;
+                                    findNearest = true;
+                                    await botClient.SendTextMessageAsync(chatId, "please enter room number");
+                                    localDate = DateTime.Now;
+                                    userConditions[chatId] = Conditions.ChoosingRoom;
                                     break;
                                 }
                             case "/ShowAllResInDay":
@@ -155,6 +158,7 @@ namespace TelegramBot
                                 {
                                     isReservation = false;
                                     await botClient.SendTextMessageAsync(chatId, "enter classroom number");
+                                    localDate = DateTime.Now;
                                     userConditions[chatId] = Conditions.ChoosingRoom;
                                     break;
                                 }
@@ -191,6 +195,7 @@ namespace TelegramBot
                         var date = e.Message.Text;
                         try
                         {
+                            Console.WriteLine(isReservation);
                             if (DateTime.Parse(date) != null)
                             {
                                 localDate = DateTime.Parse(date);
@@ -212,17 +217,20 @@ namespace TelegramBot
                     {
                         try
                         {
+                            Console.WriteLine(isReservation);
                             var roomNum = int.Parse(e.Message.Text);
                             localRoomNum = roomNum;
                             if (isReservation)
                             {
-                                var response = SendPreferencesRequest(localDate.ToString() + "/" + localRoomNum.ToString(), chatId, Conditions.ChoosingRoom);
-                                await botClient.SendTextMessageAsync(chatId, response);
+                                Console.WriteLine("addingRoom");
+                                var response = SendPreferencesRequest(localRoomNum.ToString(), chatId, Conditions.ChoosingRoom, "addRoom");
                                 userConditions[chatId] = Conditions.ApproveReservation;
                             }
                             else
                             {
-                               userConditions[chatId] = Conditions.EnableToreserve;
+                                var response = SendPreferencesRequest(localDate + "/" + localRoomNum.ToString(), chatId, Conditions.ChoosingRoom);
+                                await botClient.SendTextMessageAsync(chatId, response);
+                                userConditions[chatId] = Conditions.EnableToreserve;
                             }
                         }
                         catch
@@ -235,17 +243,44 @@ namespace TelegramBot
                     }
                 case Conditions.ApproveReservation:
                     {
+                        Console.WriteLine("Approveres");
                         var userResponse = e.Message.Text;
-                        var response = SendPreferencesRequest(localDate.ToString() + "/" + localRoomNum.ToString(), chatId, Conditions.ApproveReservation, "data");
+                        string response;
+                        if (findNearest)
+                        {
+                            response = SendPreferencesRequest(localRoomNum.ToString(), chatId, Conditions.ApproveReservation, "findNearest");
+                            Console.WriteLine("resp" + response);
+                            var data = response.Split(' ');
+                            var date = DateTime.Parse(data[0] + " " + data[1]);
+                            var roomNum = int.Parse(data[2]);
+                            localDate = date;
+                            localRoomNum = roomNum;
+                            findNearest = !findNearest;
+                        }
+                        else
+                            response = SendPreferencesRequest(localDate.ToString() + "/" + localRoomNum.ToString(), chatId, Conditions.ApproveReservation, "data");
                         //await botClient.SendTextMessageAsync(chatId, response);
-
+                        Console.WriteLine(response);
                         switch (userResponse)
                         {
                             case "yes":
                                 {
-                                    SendPreferencesRequest("", chatId, Conditions.ApproveReservation, "yes");
-                                    await botClient.SendTextMessageAsync(chatId, "your reservatian approve");
-                                    userConditions[chatId] = Conditions.EnableToreserve;
+                                    var resp = SendPreferencesRequest(localDate.ToString() + "/" + localRoomNum.ToString() , chatId, Conditions.ApproveReservation, "yes");
+                                    switch (resp)
+                                    {
+                                        case "ok":
+                                            {
+                                                await botClient.SendTextMessageAsync(chatId, "your reservatian approve");
+                                                userConditions[chatId] = Conditions.EnableToreserve;
+                                                break;
+                                            }
+                                        case "no":
+                                            {
+                                                await botClient.SendTextMessageAsync(chatId, "you can't have reservation in this time");
+                                                userConditions[chatId] = Conditions.EnableToreserve;
+                                                break;
+                                            }
+                                    }
                                     break;
                                 }
                             case "no":
@@ -258,6 +293,7 @@ namespace TelegramBot
                             default:
                                 {
                                     await botClient.SendTextMessageAsync(chatId, "are you satisfied with this time? (yes/no)\n" + response);
+                                    
                                     break;
                                 }
                         }
@@ -270,20 +306,26 @@ namespace TelegramBot
 
         private static string SendPreferencesRequest(string query, long chatId, Conditions condition, string command = "default")
         {
-            var request = WebRequest.Create($"http://localhost:8888/{condition}/{command}/{chatId}/{query}");
-            var response = request.GetResponse();
-            var responseStream = response.GetResponseStream();
-
-            using (var reader = new StreamReader(responseStream))
+            try
             {
-                var content = reader.ReadToEnd();
-                return content;
+                var request = WebRequest.Create($"http://localhost:8888/{condition}/{command}/{chatId}/{query}");
+                var response = request.GetResponse();
+                var responseStream = response.GetResponseStream();
 
-                //var result = JsonConvert.DeserializeObject<bool>(content);
-                //return result
-                //    ? new RequestResult("Preferences changed.", null)
-                //    : new RequestResult("Failed to change preferences.", null);
+                using (var reader = new StreamReader(responseStream))
+                {
+                    var content = reader.ReadToEnd();
+                    return content;
+
+                    //var result = JsonConvert.DeserializeObject<bool>(content);
+                    //return result
+                    //    ? new RequestResult("Preferences changed.", null)
+                    //    : new RequestResult("Failed to change preferences.", null);
+                }
             }
+            catch(Exception e)
+            { Console.WriteLine(e); }
+            return "";
         }
     }
 }

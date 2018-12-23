@@ -1,0 +1,14 @@
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\bin\Debug\netcoreapp2.0\BookingBot.Infrastructure.deps.json
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\bin\Debug\netcoreapp2.0\BookingBot.Infrastructure.dll
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\obj\Debug\netcoreapp2.0\BookingBot.Infrastructure.csprojResolveAssemblyReference.cache
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\obj\Debug\netcoreapp2.0\BookingBot.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\obj\Debug\netcoreapp2.0\BookingBot.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\obj\Debug\netcoreapp2.0\BookingBot.Infrastructure.AssemblyInfo.cs
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\bin\Debug\netcoreapp2.0\BookingBot.Infrastructure.runtimeconfig.json
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\bin\Debug\netcoreapp2.0\BookingBot.Infrastructure.runtimeconfig.dev.json
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\bin\Debug\netcoreapp2.0\BookingBot.Infrastructure.pdb
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\bin\Debug\netcoreapp2.0\BookingBot.Core.dll
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\bin\Debug\netcoreapp2.0\BookingBot.Core.pdb
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\obj\Debug\netcoreapp2.0\BookingBot.Infrastructure.csproj.CopyComplete
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\obj\Debug\netcoreapp2.0\BookingBot.Infrastructure.dll
+C:\Users\kolys\source\repos\BOT\BookingBot.Infrastructure\obj\Debug\netcoreapp2.0\BookingBot.Infrastructure.pdb
