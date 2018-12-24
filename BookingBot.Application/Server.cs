@@ -71,6 +71,11 @@ namespace BookingBot.Application
                                     {
                                         var reservations = repository.ResereveSessionsOfUser(chatId);
                                         StringBuilder builder = new StringBuilder();
+                                        if(!reservations.Any())
+                                        {
+                                            SendResponse(context, "haven't any res");
+                                            break;
+                                        }
                                         foreach (var r in reservations)
                                             builder.Append( repository.ReservationToStr(r) + "\n");
                                         SendResponse(context, builder.ToString());
