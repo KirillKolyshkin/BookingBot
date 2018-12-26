@@ -38,8 +38,12 @@ namespace BookingBot.Infrastructure
                 .Any();
         }
 
-        public void Cancel(ReserveSesion reserveSesion) => reserveSesion.Cancaled = true;
-
+        public void Cancel(ReserveSesion reserveSesion)
+        {
+            context.Sessions.Single(s => s.Id == reserveSesion.Id).Cancaled = true;
+            context.SaveChanges();
+        }
+        
         public ReserveSesion FindNearest(long userId, int roomNum, TimeSpan neededTime)
         {
             var context = new ReserveDataContext();
@@ -117,7 +121,9 @@ namespace BookingBot.Infrastructure
             var user = GetUserById(userId);
             return context
                 .Sessions
-                .Where(s => s.UserId == user.Id)
+                .Where(s => s.UserId == user.Id
+                && !s.Cancaled
+                && GetTimeSessionById(s.TimeSessionId).EndTime >= DateTime.Now)
                 .ToList();
         }
 
@@ -128,7 +134,8 @@ namespace BookingBot.Infrastructure
             return context
                 .Sessions
                 .Where(s => (GetTimeSessionById(s.TimeSessionId).StartTime.Date == date.Date
-                && s.RoomId == room.Id))
+                && s.RoomId == room.Id
+                && !s.Cancaled))
                 .Where(s => GetTimeSessionById(s.TimeSessionId).EndTime >= DateTime.Now)
                 .ToList();
         }

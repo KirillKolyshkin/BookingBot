@@ -16,18 +16,25 @@ namespace TelegramBot
 {
     public class Bot
     {
+        static class StringHelper
+        {
+            public static string incorectInputData = "InputDataWasIncorrect";
+            public static string helloString = "Hello, I'm booking boot, please write your name\n or press any key if you already registrated";
+            public static string exeptionString = "Smth go wrong, try again";
+            public static string chooseString = "Hello, what do you want?\nPress any key to see all commands";
+            public static string dataInputString = "Please write Date Format DD/MM/YYYY";
+            public static string roomInputString = "enter classroom number";
+        }
         static private Dictionary<long, Conditions> userConditions = new Dictionary<long, Conditions>();
         static ITelegramBotClient botClient;
         static private Dictionary<long, UserPreferences> userPreferences = new Dictionary<long, UserPreferences>();
         private class UserPreferences
         {
-            //public UserPreferences()
-            //{
-            //}
             public bool isReservation = false;
             public bool findNearest = false;
             public DateTime localDate = new DateTime();
             public int localRoomNum = 0;
+            public int resNumber = 0;
         }
 
         public void CreateBot()
@@ -103,7 +110,7 @@ namespace TelegramBot
             {
                 case Conditions.PreInitialize:
                     {
-                        await botClient.SendTextMessageAsync(chatId, "Hello, I'm booking boot, please write your name\n or press any key if you already registrated");
+                        await botClient.SendTextMessageAsync(chatId, StringHelper.helloString);
                         userConditions[chatId] = Conditions.Initialize;
                         break;
                     }
@@ -128,13 +135,13 @@ namespace TelegramBot
                                 }
                             case "hi":
                                 {
-                                    await botClient.SendTextMessageAsync(chatId, $"Hello, what do you want?");
+                                    await botClient.SendTextMessageAsync(chatId, StringHelper.chooseString);
                                     userConditions[chatId] = Conditions.EnableToreserve;
                                     break;
                                 }
                             default:
                                 {
-                                    await botClient.SendTextMessageAsync(chatId, "Smth go wrong, try again");
+                                    await botClient.SendTextMessageAsync(chatId, StringHelper.exeptionString);
                                     break;
                                 }
                         }
@@ -142,44 +149,68 @@ namespace TelegramBot
                     }
                 case Conditions.EnableToreserve:
                     {
-                        var buttonItem = new[] { "/Reserve", "/FindNearest", "/ShowAllResInDay", "/ShowAllResToday", "/ShowAllMyRes" };
+                        var buttonItem = new[] { "/Res - to reserve",
+                            "/FN - to find nearest free time to reserve classroom",
+                            "/SARInDay- to show all reservations in selected day",
+                            "/SARToday - to show all reservations today",
+                            "/SAMyRes - to show all your reservations",
+                            "/Del - to delete one of your reservations"};
                         var keyboardMarkup = new InlineKeyboardMarkup(GetInlineKeyboard(buttonItem)); //replyMarkup: keyboardMarkup
-                        var command = e.Message.Text;
+                        var command = e.Message.Text.ToLower();
                         switch (command)
                         {
-                            case "/Reserve":
+                            case "/del":
+                                {
+                                    userPreferences[chatId].isReservation = true; var response = SendPreferencesRequest("ShowAllMyRes", chatId, Conditions.EnableToreserve);
+                                    switch (response)
+                                    {
+                                        case "haven't any res":
+                                            {
+                                                await botClient.SendTextMessageAsync(chatId, "You Haven't any resorve");
+                                                break;
+                                            }
+                                        default:
+                                            {
+                                                await botClient.SendTextMessageAsync(chatId, $"choose number of reservation, which you would like to delete\n{response}");
+                                                userConditions[chatId] = Conditions.DeletingRes;
+                                                break;
+                                            }
+                                    }
+                                    break;
+                                }
+                            case "/res":
                                 {
                                     userPreferences[chatId].isReservation = true;
-                                    await botClient.SendTextMessageAsync(chatId, "Please write Date Format DD/MM/YYYY HH:MM:SS");
+                                    await botClient.SendTextMessageAsync(chatId, StringHelper.dataInputString + " HH:MM:SS");
                                     userConditions[chatId] = Conditions.ChoosingDay;
                                     break;
                                 }
-                            case "/FindNearest":
+                            case "/fn":
                                 {
                                     userPreferences[chatId].isReservation = true;
                                     userPreferences[chatId].findNearest = true;
-                                    await botClient.SendTextMessageAsync(chatId, "please enter room number");
+                                    await botClient.SendTextMessageAsync(chatId, StringHelper.roomInputString);
                                     userPreferences[chatId].localDate = DateTime.Now;
                                     userConditions[chatId] = Conditions.ChoosingRoom;
                                     break;
                                 }
-                            case "/ShowAllResInDay":
+                            case "/sarinday":
                                 {
                                     userPreferences[chatId].isReservation = false;
-                                    await botClient.SendTextMessageAsync(chatId, "Please write Date Format DD/MM/YYYY");
+                                    await botClient.SendTextMessageAsync(chatId, StringHelper.dataInputString);
                                     userPreferences[chatId].localDate = DateTime.Now;
                                     userConditions[chatId] = Conditions.ChoosingDay;
                                     break;
                                 }
-                            case "/ShowAllResToday":
+                            case "/sartoday":
                                 {
                                     userPreferences[chatId].isReservation = false;
-                                    await botClient.SendTextMessageAsync(chatId, "enter classroom number");
+                                    await botClient.SendTextMessageAsync(chatId, StringHelper.roomInputString);
                                     userPreferences[chatId].localDate = DateTime.Now;
                                     userConditions[chatId] = Conditions.ChoosingRoom;
                                     break;
                                 }
-                            case "/ShowAllMyRes":
+                            case "/samyres":
                                 {
                                     var response = SendPreferencesRequest("ShowAllMyRes", chatId, Conditions.EnableToreserve);
                                     switch (response)
@@ -201,7 +232,70 @@ namespace TelegramBot
                             default:
                                 {
                                     await botClient.SendTextMessageAsync(chatId, "Command was Incorect");
-                                    await botClient.SendTextMessageAsync(chatId, "Please write on of next operation:", replyMarkup: keyboardMarkup);
+                                    await botClient.SendTextMessageAsync(chatId, "Please write on of next operations:", replyMarkup: keyboardMarkup);
+                                    break;
+                                }
+                        }
+                        break;
+                    }
+                case Conditions.DeletingRes:
+                    {
+                        var response = SendPreferencesRequest("ShowAllMyRes", chatId, Conditions.EnableToreserve);
+                        var numOfRes = response.Split('\n').Select(s => int.Parse(s.Split(' ')[0]));
+                        var input = e.Message.Text;
+                        Console.WriteLine(input);
+                        try
+                        {
+                            var intInput = int.Parse(input);
+                            if (numOfRes.Contains(intInput))
+                            {
+                                Console.WriteLine("ok");
+                                userPreferences[chatId].resNumber = intInput;
+                                userConditions[chatId] = Conditions.DeletingApprove;
+                                await botClient.SendTextMessageAsync(chatId, $"are you sure, want you want delete this res?(yes/no)");
+                                break;
+                            }
+                            else
+                            {
+                                await botClient.SendTextMessageAsync(chatId, StringHelper.incorectInputData);
+                            }
+                        }
+                        catch
+                        {
+                            await botClient.SendTextMessageAsync(chatId, StringHelper.incorectInputData);
+                            await botClient.SendTextMessageAsync(chatId, $"choose number of reservation, which you would like to delete\n{response}");
+                        }
+                        break;
+                    }
+                case Conditions.DeletingApprove:
+                    {
+                        Console.WriteLine(userPreferences[chatId].resNumber);
+                        var userResponse = e.Message.Text;
+                        switch (userResponse)
+                        {
+                            case "yes":
+                                {
+                                    var resp = SendPreferencesRequest($"{userPreferences[chatId].resNumber}", chatId, Conditions.DeletingApprove, "yes");
+                                    switch (resp)
+                                    {
+                                        case "ok":
+                                            {
+                                                await botClient.SendTextMessageAsync(chatId, "your reservation delete");
+                                                userConditions[chatId] = Conditions.EnableToreserve;
+                                                break;
+                                            }
+                                    }
+                                    break;
+                                }
+                            case "no":
+                                {
+                                    await botClient.SendTextMessageAsync(chatId, "deleting was canceled");
+                                    userConditions[chatId] = Conditions.EnableToreserve;
+                                    break;
+                                }
+                            default:
+                                {
+                                    await botClient.SendTextMessageAsync(chatId, $"are you sure, want you want delete this res?(yes/no)");
                                     break;
                                 }
                         }
@@ -214,18 +308,23 @@ namespace TelegramBot
                         {
                             if (DateTime.Parse(date) != null)
                             {
+                                if (userPreferences[chatId].isReservation && DateTime.Parse(date) < DateTime.Now)
+                                {
+                                    await botClient.SendTextMessageAsync(chatId, "Sorry you still can't travel in past, choose another date");
+                                    break;
+                                }
                                 userPreferences[chatId].localDate = DateTime.Parse(date);
                             }
                             userConditions[chatId] = Conditions.ChoosingRoom;
-                            await botClient.SendTextMessageAsync(chatId, "enter room num");
+                            await botClient.SendTextMessageAsync(chatId, StringHelper.roomInputString);
                         }
                         catch
                         {
-                            await botClient.SendTextMessageAsync(chatId, "DateTimeWasIncorrect");
+                            await botClient.SendTextMessageAsync(chatId, StringHelper.incorectInputData);
                             if (userPreferences[chatId].isReservation)
-                                await botClient.SendTextMessageAsync(chatId, "Please write Date Format DD/MM/YYYY HH:MM:SS");
+                                await botClient.SendTextMessageAsync(chatId, StringHelper.dataInputString + " HH:MM:SS");
                             else
-                                await botClient.SendTextMessageAsync(chatId, "Please write Date Format DD/MM/YYYY");
+                                await botClient.SendTextMessageAsync(chatId, StringHelper.dataInputString);
                         }
                         break;
                     }
@@ -250,8 +349,8 @@ namespace TelegramBot
                         }
                         catch
                         {
-                            await botClient.SendTextMessageAsync(chatId, "InputDataWasIncorrect");
-                            await botClient.SendTextMessageAsync(chatId, "Please enter room num");
+                            await botClient.SendTextMessageAsync(chatId, StringHelper.incorectInputData);
+                            await botClient.SendTextMessageAsync(chatId, StringHelper.roomInputString);
                         }
 
                         break;
@@ -281,7 +380,7 @@ namespace TelegramBot
                                     {
                                         case "ok":
                                             {
-                                                await botClient.SendTextMessageAsync(chatId, "your reservatian approve");
+                                                await botClient.SendTextMessageAsync(chatId, "your reservation approve");
                                                 userConditions[chatId] = Conditions.EnableToreserve;
                                                 break;
                                             }
@@ -296,7 +395,7 @@ namespace TelegramBot
                                 }
                             case "no":
                                 {
-                                    await botClient.SendTextMessageAsync(chatId, "your reservatian canceled");
+                                    await botClient.SendTextMessageAsync(chatId, "your reservation canceled");
                                     userConditions[chatId] = Conditions.EnableToreserve;
                                     break;
                                 }

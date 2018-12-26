@@ -13,6 +13,8 @@ namespace TelegramBot
         EnableToreserve,
         ApproveReservation,
         ChoosingRoom,
-        ChoosingDay
+        ChoosingDay, 
+        DeletingRes,
+        DeletingApprove
     }
 }

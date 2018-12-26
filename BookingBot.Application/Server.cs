@@ -76,8 +76,12 @@ namespace BookingBot.Application
                                             SendResponse(context, "haven't any res");
                                             break;
                                         }
+                                        var counter = 1;
                                         foreach (var r in reservations)
-                                            builder.Append( repository.ReservationToStr(r) + "\n");
+                                        {
+                                            builder.Append($"{counter} {repository.ReservationToStr(r)}\n");
+                                            counter++;
+                                        }
                                         SendResponse(context, builder.ToString());
                                     }
                                     catch
@@ -126,6 +130,24 @@ namespace BookingBot.Application
                                     break;
                                 }
                         }
+                        break;
+                    }
+                case "DeletingApprove":
+                    {
+                        var command = tokens[1];
+                        var chatId = long.Parse(tokens[2]);
+                        var resNum = int.Parse(tokens[3]);
+                        Console.WriteLine(command);
+                        switch (command)
+                        {
+                            case "yes":
+                                {
+                                    repository.Cancel(repository.ResereveSessionsOfUser(chatId).ToArray()[resNum - 1]);
+                                    SendResponse(context, "ok");
+                                    break;
+                                }
+                        }
+
                         break;
                     }
                 case "ApproveReservation":
